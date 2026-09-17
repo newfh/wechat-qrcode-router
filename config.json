@@ -2,7 +2,7 @@
   "wechat_qrcodes": [
     {
       "id": 1,
-      "name": "寰俊鍙?瀹㈡湇1",
+      "name": "微信号-客服1",
       "qrcode_url": "https://example.com/qrcode1.png",
       "wechat_id": "kefu001",
       "status": 1,
@@ -12,7 +12,7 @@
     },
     {
       "id": 2,
-      "name": "寰俊鍙?瀹㈡湇2",
+      "name": "微信号-客服2",
       "qrcode_url": "https://example.com/qrcode2.png",
       "wechat_id": "kefu002",
       "status": 1,
@@ -22,7 +22,7 @@
     },
     {
       "id": 3,
-      "name": "寰俊鍙?瀹㈡湇3",
+      "name": "微信号-客服3",
       "qrcode_url": "https://example.com/qrcode3.png",
       "wechat_id": "kefu003",
       "status": 1,
