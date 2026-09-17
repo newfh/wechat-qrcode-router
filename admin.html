@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>娲荤爜绠＄悊鍚庡彴</title>
+    <title>活码管理后台</title>
     <link rel="stylesheet" href="styles/main.css">
     <style>
         .admin-container {
@@ -243,60 +243,60 @@
 <body>
     <div class="admin-container">
         <div class="header">
-            <h1>馃摫 寰俊鎵爜娲荤爜绠＄悊鍚庡彴</h1>
-            <button class="btn btn-primary" onclick="toggleAddForm()">+ 娣诲姞浜岀淮鐮?/button>
+            <h1>📱 微信扫码活码管理后台</h1>
+            <button class="btn btn-primary" onclick="toggleAddForm()">+ 添加二维码</button>
         </div>
         
         <div class="content">
-            <!-- 缁熻淇℃伅 -->
+            <!-- 统计信息 -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>鎬昏闂鏁?/h3>
+                    <h3>总访问次数</h3>
                     <div class="value" id="total-visits">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>褰撳墠娲昏穬鐮佹暟</h3>
+                    <h3>当前活跃码数</h3>
                     <div class="value" id="active-count">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>浜岀淮鐮佹€绘暟</h3>
+                    <h3>二维码总数</h3>
                     <div class="value" id="total-count">0</div>
                 </div>
             </div>
 
-            <!-- 璁剧疆 -->
+            <!-- 设置 -->
             <div class="settings-section">
-                <h3>鈿欙笍 鍒囨崲妯″紡璁剧疆</h3>
+                <h3>⚙️ 切换模式设置</h3>
                 <div class="form-group">
-                    <label>鍒囨崲妯″紡</label>
+                    <label>切换模式</label>
                     <select id="switch-mode" onchange="updateSettings()">
-                        <option value="round">杞妯″紡</option>
-                        <option value="random">闅忔満妯″紡</option>
+                        <option value="round">轮询模式</option>
+                        <option value="random">随机模式</option>
                     </select>
                 </div>
             </div>
 
-            <!-- 浜岀淮鐮佸垪琛?-->
+            <!-- 二维码列表 -->
             <div class="qr-list" id="qr-list"></div>
 
-            <!-- 娣诲姞浜岀淮鐮佽〃鍗?-->
+            <!-- 添加二维码表单 -->
             <div class="add-qr-form" id="add-form">
-                <h3 style="margin-bottom: 20px;">娣诲姞鏂颁簩缁寸爜</h3>
+                <h3 style="margin-bottom: 20px;">添加新二维码</h3>
                 <div class="form-group">
-                    <label>鍚嶇О</label>
-                    <input type="text" id="new-name" placeholder="渚嬪锛氬井淇″彿-瀹㈡湇4">
+                    <label>名称</label>
+                    <input type="text" id="new-name" placeholder="例如：微信号-客服4">
                 </div>
                 <div class="form-group">
-                    <label>浜岀淮鐮佸浘鐗嘦RL</label>
+                    <label>二维码图片URL</label>
                     <input type="url" id="new-url" placeholder="https://example.com/qrcode.png">
                 </div>
                 <div class="form-group">
-                    <label>寰俊鍙稩D</label>
-                    <input type="text" id="new-wechat" placeholder="渚嬪锛歬efu004">
+                    <label>微信号ID</label>
+                    <input type="text" id="new-wechat" placeholder="例如：kefu004">
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-success" onclick="addQRCode()">娣诲姞</button>
-                    <button class="btn btn-secondary" onclick="toggleAddForm()">鍙栨秷</button>
+                    <button class="btn btn-success" onclick="addQRCode()">添加</button>
+                    <button class="btn btn-secondary" onclick="toggleAddForm()">取消</button>
                 </div>
             </div>
         </div>
@@ -310,7 +310,7 @@
         
         let config = null;
 
-        // 鑾峰彇閰嶇疆
+        // 获取配置
         async function fetchConfig() {
             try {
                 const response = await fetch(
@@ -324,12 +324,12 @@
                     return true;
                 }
             } catch (error) {
-                console.error('鑾峰彇閰嶇疆澶辫触:', error);
+                console.error('获取配置失败:', error);
             }
             return false;
         }
 
-        // 鏇存柊閰嶇疆鍒?GitHub
+        // 更新配置到 GitHub
         async function updateConfig() {
             if (!config) return;
             
@@ -343,7 +343,7 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            message: `鏇存柊娲荤爜閰嶇疆 - ${new Date().toLocaleString()}`,
+                            message: `更新活码配置 - ${new Date().toLocaleString()}`,
                             content: btoa(JSON.stringify(config)),
                             sha: config.sha
                         })
@@ -353,20 +353,21 @@
                 if (response.ok) {
                     const data = await response.json();
                     config.sha = data.content.sha;
-                    alert('鏇存柊鎴愬姛锛?);
+                    alert('更新成功！');
                     return true;
                 } else {
-                    alert('鏇存柊澶辫触锛岃绋嶅悗閲嶈瘯');
+                    alert('更新失败，请稍后重试');
                     return false;
                 }
             } catch (error) {
-                console.error('鏇存柊閰嶇疆澶辫触:', error);
-                alert('鏇存柊澶辫触锛? + error.message);
+                console.error('更新配置失败:', error);
+                alert('更新失败：' + error.message);
                 return false;
             }
         }
 
-        // 娓叉煋浜岀淮鐮佸垪琛?        function renderQRList() {
+        // 渲染二维码列表
+        function renderQRList() {
             const listEl = document.getElementById('qr-list');
             listEl.innerHTML = '';
 
@@ -377,30 +378,30 @@
                     <div class="qr-header">
                         <span class="qr-name">${qr.name}</span>
                         <span class="qr-status ${qr.status === 1 ? 'active' : 'inactive'}">
-                            ${qr.status === 1 ? '鈼?娲昏穬' : '鈼?宸插仠鐢?}
+                            ${qr.status === 1 ? '● 活跃' : '○ 已停用'}
                         </span>
                     </div>
                     <div class="qr-info">
                         <div class="qr-info-item">
-                            <label>寰俊鍙?</label>
+                            <label>微信号:</label>
                             <span>${qr.wechat_id || '-'}</span>
                         </div>
                         <div class="qr-info-item">
-                            <label>璁块棶娆℃暟:</label>
+                            <label>访问次数:</label>
                             <span>${qr.visit_count}</span>
                         </div>
                         <div class="qr-info-item">
-                            <label>浠婃棩璁块棶:</label>
+                            <label>今日访问:</label>
                             <span>${qr.daily_count}</span>
                         </div>
                     </div>
                     <div class="qr-actions">
                         <button class="btn ${qr.status === 1 ? 'btn-danger' : 'btn-success'}" 
                                 onclick="toggleQRStatus(${index})">
-                            ${qr.status === 1 ? '鍋滅敤' : '鍚敤'}
+                            ${qr.status === 1 ? '停用' : '启用'}
                         </button>
                         <button class="btn btn-secondary" onclick="deleteQRCode(${index})">
-                            鍒犻櫎
+                            删除
                         </button>
                     </div>
                 `;
@@ -410,7 +411,7 @@
             updateStats();
         }
 
-        // 鏇存柊缁熻淇℃伅
+        // 更新统计信息
         function updateStats() {
             const totalVisits = config.settings.total_visits || 0;
             const activeCount = config.wechat_qrcodes.filter(qr => qr.status === 1).length;
@@ -421,33 +422,36 @@
             document.getElementById('total-count').textContent = totalCount;
         }
 
-        // 鍒囨崲浜岀淮鐮佺姸鎬?        async function toggleQRStatus(index) {
+        // 切换二维码状态
+        async function toggleQRStatus(index) {
             config.wechat_qrcodes[index].status = config.wechat_qrcodes[index].status === 1 ? 0 : 1;
             await updateConfig();
             renderQRList();
         }
 
-        // 鍒犻櫎浜岀淮鐮?        async function deleteQRCode(index) {
-            if (!confirm('纭畾瑕佸垹闄よ繖涓簩缁寸爜鍚楋紵')) return;
+        // 删除二维码
+        async function deleteQRCode(index) {
+            if (!confirm('确定要删除这个二维码吗？')) return;
             
             config.wechat_qrcodes.splice(index, 1);
             await updateConfig();
             renderQRList();
         }
 
-        // 鍒囨崲娣诲姞琛ㄥ崟
+        // 切换添加表单
         function toggleAddForm() {
             const form = document.getElementById('add-form');
             form.classList.toggle('show');
         }
 
-        // 娣诲姞浜岀淮鐮?        async function addQRCode() {
+        // 添加二维码
+        async function addQRCode() {
             const name = document.getElementById('new-name').value.trim();
             const url = document.getElementById('new-url').value.trim();
             const wechatId = document.getElementById('new-wechat').value.trim();
 
             if (!name || !url) {
-                alert('璇峰～鍐欏悕绉板拰浜岀淮鐮乁RL');
+                alert('请填写名称和二维码URL');
                 return;
             }
 
@@ -467,27 +471,28 @@
             renderQRList();
             toggleAddForm();
 
-            // 娓呯┖琛ㄥ崟
+            // 清空表单
             document.getElementById('new-name').value = '';
             document.getElementById('new-url').value = '';
             document.getElementById('new-wechat').value = '';
         }
 
-        // 鏇存柊璁剧疆
+        // 更新设置
         async function updateSettings() {
             const mode = document.getElementById('switch-mode').value;
             config.settings.switch_mode = mode;
             await updateConfig();
         }
 
-        // 鍒濆鍖?        async function init() {
+        // 初始化
+        async function init() {
             const loaded = await fetchConfig();
             if (!loaded) {
-                alert('鍔犺浇閰嶇疆澶辫触');
+                alert('加载配置失败');
                 return;
             }
 
-            // 鍔犺浇璁剧疆
+            // 加载设置
             document.getElementById('switch-mode').value = config.settings.switch_mode || 'round';
             
             renderQRList();
