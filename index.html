@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寰俊鎵爜</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="qrcode-box">
+            <img id="qrcode-img" src="" alt="寰俊鎵爜" class="qrcode-display">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>姝ｅ湪鍔犺浇浜岀淮鐮?..</p>
+            </div>
+            <div class="tip">
+                <p>璇蜂娇鐢ㄥ井淇℃壂鎻忎簩缁寸爜</p>
+            </div>
+            <div class="backup-link" id="backup-link" style="display:none;">
+                <a href="#" id="backup-url" target="_blank">濡傛棤娉曟壂鐮侊紝鐐瑰嚮鎵嬪姩娣诲姞</a>
+            </div>
+        </div>
+        <div class="info-box">
+            <p class="visit-count">宸叉壂鎻?<span id="count">0</span> 娆?/p>
+            <p class="update-time" id="update-time"></p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const GITHUB_TOKEN = 'ghp_PLACEHOLDER_TOKEN';
+            const REPO_OWNER = 'newfh';
+            const REPO_NAME = 'wechat-qrcode-router';
+            const CONFIG_FILE = 'config.json';
+            
+            let config = null;
+            let currentQRIndex = 0;
+
+            // 浠?GitHub API 鑾峰彇閰嶇疆
+            async function fetchConfig() {
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CONFIG_FILE}?token=${GITHUB_TOKEN}`
+                    );
+                    const data = await response.json();
+                    
+                    if (data.content) {
+                        config = JSON.parse(atob(data.content));
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('鑾峰彇閰嶇疆澶辫触:', error);
+                }
+                return false;
+            }
+
+            // 鏇存柊 GitHub 涓婄殑閰嶇疆
+            async function updateConfig() {
+                if (!config) return;
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CONFIG_FILE}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                message: `鏇存柊娲荤爜閰嶇疆 - ${new Date().toLocaleString()}`,
+                                content: btoa(JSON.stringify(config)),
+                                sha: config.sha || ''
+                            })
+                        }
+                    );
+                    return response.ok;
+                } catch (error) {
+                    console.error('鏇存柊閰嶇疆澶辫触:', error);
+                    return false;
+                }
+            }
+
+            // 鑾峰彇褰撳墠鏈夋晥鐨勪簩缁寸爜
+            function getActiveQRCode() {
+                const qrcodes = config.wechat_qrcodes.filter(qr => qr.status === 1);
+                if (qrcodes.length === 0) return null;
+
+                if (config.settings.switch_mode === 'round') {
+                    // 杞妯″紡
+                    currentQRIndex = currentQRIndex % qrcodes.length;
+                    return qrcodes[currentQRIndex];
+                } else if (config.settings.switch_mode === 'random') {
+                    // 闅忔満妯″紡
+                    return qrcodes[Math.floor(Math.random() * qrcodes.length)];
+                }
+                
+                return qrcodes[0];
+            }
+
+            // 澶勭悊璁块棶
+            async function handleVisit() {
+                if (!config) return;
+
+                const activeQR = getActiveQRCode();
+                if (!activeQR) {
+                    showError('鎵€鏈変簩缁寸爜宸插け鏁?);
+                    return;
+                }
+
+                // 鏇存柊璁块棶璁℃暟
+                activeQR.visit_count++;
+                activeQR.daily_count++;
+                config.settings.total_visits++;
+                config.settings.current_index = config.wechat_qrcodes.indexOf(activeQR);
+                config.settings.updated_at = new Date().toLocaleString('zh-CN');
+
+                // 鏄剧ず浜岀淮鐮?                displayQR(activeQR);
+
+                // 寮傛鏇存柊 GitHub
+                updateConfig();
+            }
+
+            // 鏄剧ず浜岀淮鐮?            function displayQR(qr) {
+                const img = document.getElementById('qrcode-img');
+                const loading = document.getElementById('loading');
+                const backupLink = document.getElementById('backup-link');
+                const backupUrl = document.getElementById('backup-url');
+                const countEl = document.getElementById('count');
+                const updateTimeEl = document.getElementById('update-time');
+
+                // 闅愯棌鍔犺浇鍔ㄧ敾
+                loading.style.display = 'none';
+                
+                // 鏄剧ず浜岀淮鐮佸浘鐗?                img.src = qr.qrcode_url;
+                img.style.display = 'block';
+                
+                // 鏄剧ず澶囩敤閾炬帴锛堝鏋滄湁鐨勮瘽锛?                if (qr.wechat_id) {
+                    backupUrl.href = `https://weixin.qq.com/r/${qr.wechat_id}`;
+                    backupLink.style.display = 'block';
+                }
+
+                // 鏇存柊璁℃暟
+                countEl.textContent = qr.visit_count;
+                updateTimeEl.textContent = `鏈€鍚庢洿鏂? ${config.settings.updated_at}`;
+            }
+
+            // 鏄剧ず閿欒
+            function showError(msg) {
+                const loading = document.getElementById('loading');
+                loading.innerHTML = `<p class="error">${msg}</p>`;
+                loading.style.display = 'block';
+            }
+
+            // 鍒濆鍖?            async function init() {
+                const loaded = await fetchConfig();
+                if (!loaded) {
+                    showError('鍔犺浇閰嶇疆澶辫触锛岃绋嶅悗閲嶈瘯');
+                    return;
+                }
+
+                await handleVisit();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
