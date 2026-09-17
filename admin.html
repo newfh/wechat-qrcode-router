@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>娲荤爜绠＄悊鍚庡彴</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .qr-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .qr-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .qr-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .qr-item.active {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .qr-item.inactive {
+            border-color: #f44336;
+            background: #ffebee;
+            opacity: 0.7;
+        }
+
+        .qr-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .qr-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .qr-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .qr-status.active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .qr-status.inactive {
+            background: #f44336;
+            color: white;
+        }
+
+        .qr-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .qr-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qr-info-item label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .qr-info-item span {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #43a047;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53935;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .add-qr-form {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .add-qr-form.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .settings-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <h1>馃摫 寰俊鎵爜娲荤爜绠＄悊鍚庡彴</h1>
+            <button class="btn btn-primary" onclick="toggleAddForm()">+ 娣诲姞浜岀淮鐮?/button>
+        </div>
+        
+        <div class="content">
+            <!-- 缁熻淇℃伅 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>鎬昏闂鏁?/h3>
+                    <div class="value" id="total-visits">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>褰撳墠娲昏穬鐮佹暟</h3>
+                    <div class="value" id="active-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>浜岀淮鐮佹€绘暟</h3>
+                    <div class="value" id="total-count">0</div>
+                </div>
+            </div>
+
+            <!-- 璁剧疆 -->
+            <div class="settings-section">
+                <h3>鈿欙笍 鍒囨崲妯″紡璁剧疆</h3>
+                <div class="form-group">
+                    <label>鍒囨崲妯″紡</label>
+                    <select id="switch-mode" onchange="updateSettings()">
+                        <option value="round">杞妯″紡</option>
+                        <option value="random">闅忔満妯″紡</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 浜岀淮鐮佸垪琛?-->
+            <div class="qr-list" id="qr-list"></div>
+
+            <!-- 娣诲姞浜岀淮鐮佽〃鍗?-->
+            <div class="add-qr-form" id="add-form">
+                <h3 style="margin-bottom: 20px;">娣诲姞鏂颁簩缁寸爜</h3>
+                <div class="form-group">
+                    <label>鍚嶇О</label>
+                    <input type="text" id="new-name" placeholder="渚嬪锛氬井淇″彿-瀹㈡湇4">
+                </div>
+                <div class="form-group">
+                    <label>浜岀淮鐮佸浘鐗嘦RL</label>
+                    <input type="url" id="new-url" placeholder="https://example.com/qrcode.png">
+                </div>
+                <div class="form-group">
+                    <label>寰俊鍙稩D</label>
+                    <input type="text" id="new-wechat" placeholder="渚嬪锛歬efu004">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="addQRCode()">娣诲姞</button>
+                    <button class="btn btn-secondary" onclick="toggleAddForm()">鍙栨秷</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GITHUB_TOKEN = 'ghp_PLACEHOLDER_TOKEN';
+        const REPO_OWNER = 'newfh';
+        const REPO_NAME = 'wechat-qrcode-router';
+        const CONFIG_FILE = 'config.json';
+        
+        let config = null;
+
+        // 鑾峰彇閰嶇疆
+        async function fetchConfig() {
+            try {
+                const response = await fetch(
+                    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CONFIG_FILE}?token=${GITHUB_TOKEN}`
+                );
+                const data = await response.json();
+                
+                if (data.content) {
+                    config = JSON.parse(atob(data.content));
+                    config.sha = data.sha;
+                    return true;
+                }
+            } catch (error) {
+                console.error('鑾峰彇閰嶇疆澶辫触:', error);
+            }
+            return false;
+        }
+
+        // 鏇存柊閰嶇疆鍒?GitHub
+        async function updateConfig() {
+            if (!config) return;
+            
+            try {
+                const response = await fetch(
+                    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CONFIG_FILE}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `鏇存柊娲荤爜閰嶇疆 - ${new Date().toLocaleString()}`,
+                            content: btoa(JSON.stringify(config)),
+                            sha: config.sha
+                        })
+                    }
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    config.sha = data.content.sha;
+                    alert('鏇存柊鎴愬姛锛?);
+                    return true;
+                } else {
+                    alert('鏇存柊澶辫触锛岃绋嶅悗閲嶈瘯');
+                    return false;
+                }
+            } catch (error) {
+                console.error('鏇存柊閰嶇疆澶辫触:', error);
+                alert('鏇存柊澶辫触锛? + error.message);
+                return false;
+            }
+        }
+
+        // 娓叉煋浜岀淮鐮佸垪琛?        function renderQRList() {
+            const listEl = document.getElementById('qr-list');
+            listEl.innerHTML = '';
+
+            config.wechat_qrcodes.forEach((qr, index) => {
+                const item = document.createElement('div');
+                item.className = `qr-item ${qr.status === 1 ? 'active' : 'inactive'}`;
+                item.innerHTML = `
+                    <div class="qr-header">
+                        <span class="qr-name">${qr.name}</span>
+                        <span class="qr-status ${qr.status === 1 ? 'active' : 'inactive'}">
+                            ${qr.status === 1 ? '鈼?娲昏穬' : '鈼?宸插仠鐢?}
+                        </span>
+                    </div>
+                    <div class="qr-info">
+                        <div class="qr-info-item">
+                            <label>寰俊鍙?</label>
+                            <span>${qr.wechat_id || '-'}</span>
+                        </div>
+                        <div class="qr-info-item">
+                            <label>璁块棶娆℃暟:</label>
+                            <span>${qr.visit_count}</span>
+                        </div>
+                        <div class="qr-info-item">
+                            <label>浠婃棩璁块棶:</label>
+                            <span>${qr.daily_count}</span>
+                        </div>
+                    </div>
+                    <div class="qr-actions">
+                        <button class="btn ${qr.status === 1 ? 'btn-danger' : 'btn-success'}" 
+                                onclick="toggleQRStatus(${index})">
+                            ${qr.status === 1 ? '鍋滅敤' : '鍚敤'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="deleteQRCode(${index})">
+                            鍒犻櫎
+                        </button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+
+            updateStats();
+        }
+
+        // 鏇存柊缁熻淇℃伅
+        function updateStats() {
+            const totalVisits = config.settings.total_visits || 0;
+            const activeCount = config.wechat_qrcodes.filter(qr => qr.status === 1).length;
+            const totalCount = config.wechat_qrcodes.length;
+
+            document.getElementById('total-visits').textContent = totalVisits;
+            document.getElementById('active-count').textContent = activeCount;
+            document.getElementById('total-count').textContent = totalCount;
+        }
+
+        // 鍒囨崲浜岀淮鐮佺姸鎬?        async function toggleQRStatus(index) {
+            config.wechat_qrcodes[index].status = config.wechat_qrcodes[index].status === 1 ? 0 : 1;
+            await updateConfig();
+            renderQRList();
+        }
+
+        // 鍒犻櫎浜岀淮鐮?        async function deleteQRCode(index) {
+            if (!confirm('纭畾瑕佸垹闄よ繖涓簩缁寸爜鍚楋紵')) return;
+            
+            config.wechat_qrcodes.splice(index, 1);
+            await updateConfig();
+            renderQRList();
+        }
+
+        // 鍒囨崲娣诲姞琛ㄥ崟
+        function toggleAddForm() {
+            const form = document.getElementById('add-form');
+            form.classList.toggle('show');
+        }
+
+        // 娣诲姞浜岀淮鐮?        async function addQRCode() {
+            const name = document.getElementById('new-name').value.trim();
+            const url = document.getElementById('new-url').value.trim();
+            const wechatId = document.getElementById('new-wechat').value.trim();
+
+            if (!name || !url) {
+                alert('璇峰～鍐欏悕绉板拰浜岀淮鐮乁RL');
+                return;
+            }
+
+            const newQR = {
+                id: config.wechat_qrcodes.length + 1,
+                name: name,
+                qrcode_url: url,
+                wechat_id: wechatId,
+                status: 1,
+                visit_count: 0,
+                daily_limit: 0,
+                daily_count: 0
+            };
+
+            config.wechat_qrcodes.push(newQR);
+            await updateConfig();
+            renderQRList();
+            toggleAddForm();
+
+            // 娓呯┖琛ㄥ崟
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-url').value = '';
+            document.getElementById('new-wechat').value = '';
+        }
+
+        // 鏇存柊璁剧疆
+        async function updateSettings() {
+            const mode = document.getElementById('switch-mode').value;
+            config.settings.switch_mode = mode;
+            await updateConfig();
+        }
+
+        // 鍒濆鍖?        async function init() {
+            const loaded = await fetchConfig();
+            if (!loaded) {
+                alert('鍔犺浇閰嶇疆澶辫触');
+                return;
+            }
+
+            // 鍔犺浇璁剧疆
+            document.getElementById('switch-mode').value = config.settings.switch_mode || 'round';
+            
+            renderQRList();
+        }
+
+        init();
+    </script>
+</body>
+</html>
